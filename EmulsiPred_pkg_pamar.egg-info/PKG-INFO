@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: EmulsiPred-pkg-pamar
+Version: 0.0.1
+Summary: A package to predict emulsifying potential of peptides
+Home-page: https://github.com/MarcatiliLab/sampleproject
+Author: Paolo Marcatili, Tobias Olsen, Egon Hansen
+Author-email: pamar@dtu.dk
+License: UNKNOWN
+Description: # EmulsiPred
+        Prediction of Emulsifying Peptides
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown

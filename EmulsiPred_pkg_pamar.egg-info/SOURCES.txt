@@ -1,0 +1,6 @@
+README.md
+setup.py
+EmulsiPred_pkg_pamar.egg-info/PKG-INFO
+EmulsiPred_pkg_pamar.egg-info/SOURCES.txt
+EmulsiPred_pkg_pamar.egg-info/dependency_links.txt
+EmulsiPred_pkg_pamar.egg-info/top_level.txt
