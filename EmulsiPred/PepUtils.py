@@ -1,14 +1,8 @@
-import sys
-import os
-import fileinput
 import numpy as np
+import pandas as pd
+import os
 import math
 import operator
-import urllib.error
-from Bio.Seq import Seq
-from Bio import ExPASy
-from Bio import SwissProt
-from Bio import SeqIO
 
 # Hydrophobicity scale
 def hydrophobicity_scale(hydro):
@@ -216,6 +210,46 @@ def g_emul_calcer(seq, Kaa):
 
     return(emul_list)
 
+def g_emul(sequences,norm_df):
+
+    Kaa = hydrophobicity_scale(1)
+    g_best = []
+
+    for name in sequences:
+        g_scores={}
+        seq = sequences[name]
+
+        for i,res in enumerate(seq):
+
+            for j in range(7, 31):
+                if i + j <= len(seq):
+
+                    # Calculate the hydrophobicity for the peptide
+                    gamma = g_emul_calcer(seq[i:(i+j)], Kaa)
+                    gamma = sorted(gamma, key=operator.itemgetter(0), reverse=True)[0:10]
+
+                    # Pick the right values for normalization
+                    temp_df = norm_df.loc[(norm_df['Length'] == len(seq[i:(i + j)])) & (norm_df['Cut'] == gamma[0][1])]
+
+                    # Pick cut which gives the highest score (used to represent that peptide) and normalize it
+                    g_scores[name, seq[i:(i + j)], gamma[0][1]] = z_normalize(gamma[0][0], temp_df.iloc[0][2], temp_df.iloc[0][3])
+
+        # Make sure it is always only the 10000 best which are saved (makes it run faster)
+        g_best = highest_in_list(g_best, g_scores, 10000)
+
+    # Groups repetitive sequences
+    switched_gamma = switch_dictionary_gamma(g_best)
+
+    best_emul = pd.DataFrame.from_dict(switched_gamma, orient='index', columns=['score', 'names'])
+    best_emul['sequence'] = best_emul.index
+    best_emul.reset_index(inplace=True, drop=True)
+    best_emul['nr_names'] = best_emul.names.apply(len)
+    best_emul['cut'] = best_emul.sequence.apply(lambda x: x[1])
+    best_emul['sequence'] = best_emul.sequence.apply(lambda x: x[0])
+
+    return best_emul
+
+
 # Functions that calculate the hydrophobicity for peptides with a-helices and b-sheets
 def accum_emulsifier(emulsify_func, seq, kaa):
     # Function to sum the vectors from alpha and beta
@@ -272,7 +306,12 @@ def emul(data_dic,norm_df,type):
     # Groups repetitive sequences
     best_emul = switch_dictionary(best)
 
-    return(best_emul)
+    best_emul = pd.DataFrame.from_dict(best_emul, orient='index', columns=['score', 'names'])
+    best_emul['sequence'] = best_emul.index
+    best_emul.reset_index(inplace=True, drop=True)
+    best_emul['nr_names'] = best_emul.names.apply(len)
+
+    return best_emul
 
 
 
@@ -322,3 +361,25 @@ def switch_dictionary(thedic):
                     lister[k] = i[1],a.split(',')
 
     return(lister)
+
+
+def cut_offs(results, nr_names=4, score=2):
+    # Removing peptides with less than 2 as a z-score and seen in less than 4 accession numbers
+
+    bdf = results.copy()
+
+    bdf = bdf[bdf['nr_names'] >= nr_names]
+    bdf = bdf[bdf['score'] >= score]
+
+    return bdf
+
+def charge_counter(seq):
+    neg = 0
+    pos = 0
+    for res in range(len(seq)):
+        if seq[res] == 'D' or seq[res] =='E':
+            neg += 1
+        elif seq[res] == 'R' or seq[res] == 'K':
+            pos += 1
+
+    return pos - neg
