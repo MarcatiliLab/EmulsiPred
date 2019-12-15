@@ -1,6 +1,6 @@
-from Alpha_emulsifier import AlphaEmulPred
-from Beta_emulsifier import BetaEmulPred
-from Gamma_emulsifier import GammaEmulPred
+from .Alpha_emulsifier import AlphaEmulPred
+from .Beta_emulsifier import BetaEmulPred
+from .Gamma_emulsifier import GammaEmulPred
 import argparse
 import os
 
@@ -21,7 +21,7 @@ def EmulsiPred(sequences, netsurfp_results, norm_vals, out_dir, nr_names, lower_
 
 if __name__ == '__main__':
 
-    # python EmulsiPred.py -n ../netsurfp2_results.txt -v ../a_norm.csv -o ../Results
+    # python All_emulsifiers.py -n ../netsurfp2_results.txt -v ../a_norm.csv -o ../Results
 
     # Parse it in
     parser = argparse.ArgumentParser()

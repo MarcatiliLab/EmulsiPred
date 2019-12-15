@@ -1,4 +1,4 @@
-import PepUtils as pu
+import EmulsiPred.PepUtils as pu
 import argparse
 import pandas as pd
 import os
