@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
-import os
 import math
 import operator
 
-# Hydrophobicity scale
+
 def hydrophobicity_scale(hydro):
 
     # Hydrophobicity scale for Kyte-Doolittle:
@@ -20,7 +19,8 @@ def hydrophobicity_scale(hydro):
 
     return(Kaa)
 
-############ Making the normalizations
+
+# Making the normalizations
 def norm_alpha(seq, w1=7, w2=30, hydro=1):
 
     # Choose the right scale
@@ -53,6 +53,7 @@ def norm_alpha(seq, w1=7, w2=30, hydro=1):
 
     return(h_alpha)
 
+
 def norm_beta(seq, w1=7, w2=30, hydro=1):
 
     # Choose the right scale
@@ -84,6 +85,7 @@ def norm_beta(seq, w1=7, w2=30, hydro=1):
         h_beta.append([w,hydro_beta,len(hydro_beta)])
 
     return(h_beta)
+
 
 def norm_gamma(seq, w1=7, w2=30, hydro=1):
 
@@ -123,14 +125,15 @@ def norm_gamma(seq, w1=7, w2=30, hydro=1):
 
     return(gamma_list)
 
+
 def z_normalize(score, mean, std):
     # Normalizes with the help of z-score
     normalized = (score-mean)/std
 
     return(normalized)
 
-############# Read inputs (sequences in fasta file and netsurfp results)
 
+# Read inputs (sequences in fasta file and netsurfp results)
 def read_fasta(fp):
     name, seq = None, []
     for line in fp:
@@ -142,6 +145,7 @@ def read_fasta(fp):
             seq.append(line)
     if name: yield (name, ''.join(seq))
 
+
 def read_fasta_file(fasta_file):
     gamma_dic = {}
     with open(fasta_file) as sequences:
@@ -149,6 +153,7 @@ def read_fasta_file(fasta_file):
             gamma_dic[name[1:]] = seq
 
     return(gamma_dic)
+
 
 def get_netsurfp_results(netsurfp_results, type):
 
@@ -181,7 +186,6 @@ def get_netsurfp_results(netsurfp_results, type):
 
     return(dic_of_vals)
 
-############## Calculation of hydrophobicity
 
 # Functions that calculate the hydrophobicity for peptides with random coil
 def gamma_emul_calc(seq, Kaa, i):
@@ -193,6 +197,7 @@ def gamma_emul_calc(seq, Kaa, i):
     emul = abs(window_l1 - window_l2)
 
     return(emul)
+
 
 def g_emul_calcer(seq, Kaa):
 
@@ -209,6 +214,7 @@ def g_emul_calcer(seq, Kaa):
         emul_list.append([gamma_emul_calc(seq, Kaa, i), i])
 
     return(emul_list)
+
 
 def g_emul(sequences,norm_df):
 
@@ -263,6 +269,7 @@ def accum_emulsifier(emulsify_func, seq, kaa):
     emul_score = math.hypot(temp_vec[0], temp_vec[1])
     return(emul_score)
 
+
 def alpha_emul(amino, n, Kaa):
     # Find the hydrophobicity value for each amino acid
     n += 1
@@ -270,12 +277,14 @@ def alpha_emul(amino, n, Kaa):
     vector = K * np.array([math.cos(n * (( 5 /9 ) *math.pi)), math.sin(n * (( 5 /9 ) *math.pi))])
     return vector
 
+
 def beta_emul(amino, n, Kaa):
     # Find the hydrophobicity value for each amino acid
     n += 1
     K = Kaa[amino]
     vector = K * np.array([math.cos(n * (math.pi)), math.sin(n * (math.pi))])
     return vector
+
 
 def emul(data_dic,norm_df,type):
     # Main function for calculating emul values for alpha and beta
@@ -314,7 +323,6 @@ def emul(data_dic,norm_df,type):
     return best_emul
 
 
-
 # Extra functions
 def highest_in_list(knownlist, newlist, number_in_list=100000):
 
@@ -325,6 +333,7 @@ def highest_in_list(knownlist, newlist, number_in_list=100000):
     knownlist = sorted(knownlist, key=operator.itemgetter(1), reverse=True)[0:number_in_list]
 
     return(knownlist)
+
 
 def switch_dictionary_gamma(thedic):
     # Switches a dictionary around
@@ -343,6 +352,7 @@ def switch_dictionary_gamma(thedic):
                     lister[k] = i[1],a.split(','),i[0][2]
 
     return(lister)
+
 
 def switch_dictionary(thedic):
 # Switches a dictionary around
@@ -373,6 +383,7 @@ def cut_offs(results, nr_names=4, score=2):
 
     return bdf
 
+
 def charge_counter(seq):
     neg = 0
     pos = 0
@@ -383,3 +394,56 @@ def charge_counter(seq):
             pos += 1
 
     return pos - neg
+
+
+# Save functions
+def a_txt_file(result_df, out_path):
+    with open(out_path, 'w') as outfile:
+        outfile.write('-----' + '\t' +
+                      'Charge' + '\t' +
+                      'Kyte-Doolittle' + '\t' +
+                      'Sequence' + '\t\t\t' +
+                      'Diff seqs' + '\n')
+        for row in result_df.itertuples(index=True, name='Pandas'):
+            outfile.write("ALPHA" + '\t' +
+                          "{:<5}".format(str(getattr(row, "charge"))) + '\t' +
+                          '{:.5f}'.format(getattr(row, 'score')) + '\t\t\t' +
+                          "{:<31}".format(getattr(row, 'sequence')) + '\t' +
+                          str(getattr(row, 'nr_names')) + '\t' +
+                          str(getattr(row, 'names')) + '\n')
+
+
+def b_txt_file(result_df, out_path):
+    with open(out_path, 'w') as outfile:
+        outfile.write('-----' + '\t' +
+                      'Charge' + '\t' +
+                      'Kyte-Doolittle' + '\t' +
+                      'Sequence' + '\t\t\t' +
+                      'Diff seqs' + '\n')
+        for row in result_df.itertuples(index=True, name='Pandas'):
+            outfile.write("BETA" + '\t' +
+                          "{:<5}".format(str(getattr(row, "charge"))) + '\t' +
+                          '{:.5f}'.format(getattr(row, 'score')) + '\t\t\t' +
+                          "{:<31}".format(getattr(row, 'sequence')) + '\t' +
+                          str(getattr(row, 'nr_names')) + '\t' +
+                          str(getattr(row, 'names')) + '\n')
+
+
+def g_txt_file(result_df, out_path):
+    # Writes the results in a nice viewable file
+    with open(out_path, 'w') as outfile:
+        outfile.write('-----' + '\t' +
+                      'Charge' + '\t' +
+                      'Cut' '\t\t' +
+                      'Kyte-Doolittle' + '\t' +
+                      'Sequence' + '\t\t\t' +
+                      'Diff seqs' + '\n')
+
+        for row in result_df.itertuples(index=True, name='Pandas'):
+            outfile.write("GAMMA" + '\t' +
+                          "{:<5}".format(str(getattr(row, "charge"))) + '\t' +
+                          '{}'.format(getattr(row, 'cut')) + '\t\t' +
+                          '{:.5f}'.format(getattr(row, 'score')) + '\t\t\t' +
+                          "{:<31}".format(getattr(row, 'sequence')) + '\t' +
+                          str(getattr(row, 'nr_names')) + '\t' +
+                          str(getattr(row, 'names')) + '\n')

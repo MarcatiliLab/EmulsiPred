@@ -1,3 +1,4 @@
 .gitignore
 .idea/
 EmulsiPred/__pycache__/
+EmulsiPred_env
