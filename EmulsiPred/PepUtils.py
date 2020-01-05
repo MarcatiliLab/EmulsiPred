@@ -17,113 +17,7 @@ def hydrophobicity_scale(hydro):
                'J': 0, 'K': 3.00, 'L': -1.80, 'M': -1.30, 'N': 0.20, 'P': 0.00, 'Q': 0.20, 'R': 3.00, 'S': 0.30,
                'T': -0.40, 'V': -1.50, 'W': -3.40, 'Y': -2.30, 'X': 0, 'Z': 0, 'O': 0, 'U': 0}
 
-    return(Kaa)
-
-
-# Making the normalizations
-def norm_alpha(seq, w1=7, w2=30, hydro=1):
-
-    # Choose the right scale
-    Kaa = hydrophobicity_scale(hydro)
-    h_alpha = []
-
-    for w in range(w1 ,w2):
-        hydro_alpha = []
-
-        # Window offset; where in the list do we start looking
-        window_offset = 0
-        # Window end; where in the list do we stop looking
-        window_end = w
-
-        while window_end <= len(seq) and len(seq) >= w and len(hydro_alpha)<40000:
-            # Get the sequence of the current window
-            window_seq = seq[window_offset:window_end]
-
-            # Run equation for alpha helix on the window and sum the vectors
-            alpha = accum_emulsifier(alpha_emulsifier, window_seq, Kaa)
-
-            hydro_alpha.append(math.hypot(alpha[0], alpha[1]))
-
-            # Update window_offset
-            window_offset = window_end
-            # Update window_end
-            window_end = window_offset + w
-
-        h_alpha.append([w,hydro_alpha,len(hydro_alpha)])
-
-    return(h_alpha)
-
-
-def norm_beta(seq, w1=7, w2=30, hydro=1):
-
-    # Choose the right scale
-    Kaa = hydrophobicity_scale(hydro)
-    h_beta = []
-
-    for w in range(w1 ,w2):
-        hydro_beta = []
-
-        # Window offset; where in the list do we start looking
-        window_offset = 0
-        # Window end; where in the list do we stop looking
-        window_end = w
-
-        while window_end <= len(seq) and len(seq) >= w and len(hydro_beta)<40000:
-            # Get the sequence of the current window
-            window_seq = seq[window_offset:window_end]
-
-            # Run equation for alpha helix on the window and sum the vectors
-            beta = accum_emulsifier(beta_emulsifier, window_seq, Kaa)
-
-            hydro_beta.append(math.hypot(beta[0], beta[1]))
-
-            # Update window_offset
-            window_offset = window_end
-            # Update window_end
-            window_end = window_offset + w
-
-        h_beta.append([w,hydro_beta,len(hydro_beta)])
-
-    return(h_beta)
-
-
-def norm_gamma(seq, w1=7, w2=30, hydro=1):
-
-    # Choose the right scale
-    Kaa = hydrophobicity_scale(hydro)
-    gamma_list = []
-
-    for w in range(w1 ,w2):
-
-        hydro_gamma = []
-
-        # Window offset; where in the list do we start looking
-        window_offset = 0
-        # Window end; where in the list do we stop looking
-        window_end = w
-
-        while window_end <= len(seq) and len(seq) >= w and len(hydro_gamma)<40000:
-            # Get the sequence of the current window
-            window_seq = seq[window_offset:window_end]
-
-            gamma = g_emul_calcer(window_seq, Kaa)
-
-            for k in range(len(gamma)):
-
-                try:
-                    hydro_gamma[k][1]+=[gamma[k][0]]
-                except(IndexError):
-                    hydro_gamma.append([gamma[k][1]])
-                    hydro_gamma[k].append([gamma[k][0]])
-            # Update window_offset
-            window_offset = window_end
-            # Update window_end
-            window_end = window_offset + w
-
-        gamma_list.append([w,hydro_gamma])
-
-
-    return(gamma_list)
+    return Kaa
 
 
 def z_normalize(score, mean, std):
@@ -216,7 +110,7 @@ def g_emul_calcer(seq, Kaa):
     return(emul_list)
 
 
-def g_emul(sequences,norm_df):
+def g_emul(sequences, norm_df):
 
     Kaa = hydrophobicity_scale(1)
     g_best = []
@@ -286,7 +180,7 @@ def beta_emul(amino, n, Kaa):
     return vector
 
 
-def emul(data_dic,norm_df,type):
+def emul(data_dic, norm_df, type):
     # Main function for calculating emul values for alpha and beta
 
     threshold = 0.3
@@ -373,12 +267,12 @@ def switch_dictionary(thedic):
     return(lister)
 
 
-def cut_offs(results, nr_names=4, score=2):
+def cut_offs(results, nr_seq=4, score=2):
     # Removing peptides with less than 2 as a z-score and seen in less than 4 accession numbers
 
     bdf = results.copy()
 
-    bdf = bdf[bdf['nr_names'] >= nr_names]
+    bdf = bdf[bdf['nr_names'] >= nr_seq]
     bdf = bdf[bdf['score'] >= score]
 
     return bdf

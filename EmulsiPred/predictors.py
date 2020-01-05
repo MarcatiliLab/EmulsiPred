@@ -4,18 +4,18 @@ import os
 import pkg_resources
 
 
-def EmulsiPred(sequences, netsurfp_results, out_dir='', nr_names='1', lower_score='2.'):
+def EmulsiPred(sequences, netsurfp_results, out_dir='', nr_seq='1', lower_score='2.'):
 
     a_class = AlphaEmulPred(netsurfp_results, out_dir)
-    a_class.peptide_cutoffs(nr_names=int(nr_names), score=float(lower_score))
+    a_class.peptide_cutoffs(nr_seq=int(nr_seq), score=float(lower_score))
     a_class.save_alpha()
 
     b_class = BetaEmulPred(netsurfp_results, out_dir)
-    b_class.peptide_cutoffs(nr_names=int(nr_names), score=float(lower_score))
+    b_class.peptide_cutoffs(nr_seq=int(nr_seq), score=float(lower_score))
     b_class.save_beta()
 
     g_class = GammaEmulPred(sequences, out_dir)
-    g_class.peptide_cutoffs(nr_names=int(nr_names), score=float(lower_score))
+    g_class.peptide_cutoffs(nr_seq=int(nr_seq), score=float(lower_score))
     g_class.save_gamma()
 
 
@@ -37,9 +37,9 @@ class AlphaEmulPred:
         # Calculation of the hydrophobicity + normalization
         return self._adjusted_predictions
 
-    def peptide_cutoffs(self, nr_names=4, score=2.):
+    def peptide_cutoffs(self, nr_seq=4, score=2.):
         # Removes peptides depending on the defined cut offs
-        self._adjusted_predictions = pu.cut_offs(self._predictions, nr_names, score)
+        self._adjusted_predictions = pu.cut_offs(self._predictions, nr_seq, score)
 
     def save_alpha(self):
 
@@ -70,9 +70,9 @@ class BetaEmulPred:
         # Calculation of the hydrophobicity + normalization
         return self._adjusted_predictions
 
-    def peptide_cutoffs(self, nr_names=4, score=2.):
+    def peptide_cutoffs(self, nr_seq=4, score=2.):
         # Removes peptides depending on the defined cut offs
-        self._adjusted_predictions = pu.cut_offs(self._predictions, nr_names, score)
+        self._adjusted_predictions = pu.cut_offs(self._predictions, nr_seq, score)
 
     def save_beta(self):
         s_df = self._adjusted_predictions
@@ -102,9 +102,9 @@ class GammaEmulPred:
         # Calculation of the hydrophobicity + normalization
         return self._adjusted_predictions
 
-    def peptide_cutoffs(self, nr_names=4, score=2.):
+    def peptide_cutoffs(self, nr_seq=4, score=2.):
         # Removes peptides depending on the defined cut offs
-        self._adjusted_predictions = pu.cut_offs(self._predictions, nr_names, score)
+        self._adjusted_predictions = pu.cut_offs(self._predictions, nr_seq, score)
 
     def save_gamma(self):
         s_df = self._adjusted_predictions

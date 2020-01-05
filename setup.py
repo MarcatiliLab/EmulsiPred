@@ -14,7 +14,7 @@ setuptools.setup(
     description="A package to predict emulsifying potential of peptides",
     long_description=long_description,  # README.md file as description
     long_description_content_type="text/markdown",
-    url="https://github.com/MarcatiliLab/sampleproject",
+    url="https://github.com/MarcatiliLab/EmulsiPred",
     packages=setuptools.find_packages(),
     install_requires=install_requires,  # Install requirements extracted from requirements.txt
     include_package_data=True,  # Allow to include other files than .py in package
