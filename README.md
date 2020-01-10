@@ -27,13 +27,10 @@ The following commands are run in the command line.
     pip install EmulsiPred
 ~~~
     
-3b: Install EmulsiPred by cloning from github and then installing with pip.
+3b: Install EmulsiPred by installing from github with pip.
 
 ~~~.sh
-    git clone https://github.com/MarcatiliLab/EmulsiPred.git
-    cd EmulsiPred
-    pip install .
-    cd ..
+    pip install "git+https://github.com/MarcatiliLab/EmulsiPred.git"
 ~~~ 
 
 After either running 3a or 3b EmulsiPred is installed within the
