@@ -7,7 +7,7 @@ with open('requirements.txt') as f:
     install_requires = f.read().strip().split('\n')
 
 setuptools.setup(
-    name="EmulsiPred-pkg-pamar",  # Name of package
+    name="EmulsiPred",  # Name of package
     version="0.0.1.1",
     author="Paolo Marcatili, Tobias Olsen, Egon Hansen",
     author_email="pamar@dtu.dk",
