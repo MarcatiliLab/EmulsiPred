@@ -1,5 +1,8 @@
 # EmulsiPred
-Prediction of Emulsifying Peptides
+Prediction of Emulsifying Peptides, based on protein sequences (in fasta format) and
+their corresponding results from NetSurfP-2 (http://www.cbs.dtu.dk/services/NetSurfP/).
+The NetSurfP-2 file should be in the NetSurfP-1 Format (retrieved when clicking 'Export All'
+in the upper right side of NetSurfP's 'Server Output' window).
 
 
 #### Prerequisites and installation
@@ -12,52 +15,61 @@ recommended to install the package in a new environment.
 The following commands are run in the command line.
 
 1: Set up a new environment.
-    
+~~~.sh  
     python3 -m venv EmulsiPred_env
-
+~~~
 2: Enter (activate) the environment.
-
+~~~.sh
     source EmulsiPred_env/bin/activate
-
+~~~
 3a: Install EmulsiPred within the activated environment with pip.
-
+~~~.sh
     pip install EmulsiPred
+~~~
     
 3b: Install EmulsiPred by cloning from github and then installing with pip.
 
+~~~.sh
     git clone https://github.com/MarcatiliLab/EmulsiPred.git
     cd EmulsiPred
     pip install .
     cd ..
-    
+~~~ 
 
 After either running 3a or 3b EmulsiPred is installed within the
-environment you have created (in our case EmulsiPred_env).
+activated environment (in our case EmulsiPred_env).
+
 ---
 #### Running EmulsiPred
 
 After installation, EmulsiPred can be run from the terminal or
-within a python script (with a little more flexibility from a
-script).
+within a python script.
 
-EmulsiPred requires 2 inputs.
+As mentioned above, EmulsiPred requires 2 inputs.
 1) A fasta file containing the protein sequences to check for emulsifiers (termed sequence.fsa).
 2) A NetSurfP file containing secondary structure information of the sequences in sequence.fsa (termed netsurfp.txt)  
 
 Additionally, there are also 3 variable parameters. 
-1) o: Output directory (default is current directory).
-2) nr_seq: minimum number of sequences a peptide in the output is present in (default 1).
-3) ls (lower score): minumum score a peptide in the output has (default 2).  
+1) o (out_dir): Output directory (default is the current directory).
+2) nr_seq: Results will only include peptides present in this number of sequences or higher (default 1).
+3) ls (lower score): Results will only include peptides with a score higher than this score (default 2).  
 
 EmulsiPred can be run directly in the terminal with the following
 command.
-
+~~~.sh
     python -m EmulsiPred -s path/to/sequence.fsa -n path/to/netsurfp.txt -o path/to/out_dir --nr_seq 1 --ls 2
-    
+~~~ 
 Furthermore, it can be imported and run in a python script.
 
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~python
 import EmulsiPred as ep
 
 ep.EmulsiPred(sequences='path/to/sequence.fsa', netsurfp_results='path/to/netsurfp.txt', out_dir='path/to/out_dir', nr_seq=1, lower_score=2)
 ~~~~~~~~~~~~~~~~~~~~~
+
+#### Interpretation of predictions
+
+The predicted values are a relative ordering 
+of the peptides by chance of being an emulsifier. 
+In other words, a higher score implies a higher chance 
+of being an emulsifier. 

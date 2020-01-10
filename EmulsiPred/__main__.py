@@ -9,9 +9,9 @@ if __name__ == '__main__':
     parser.add_argument('-n', dest='netsurfp_results', required=True, help='Txt file with netsurfp results.')
     parser.add_argument('-o', dest='out_dir', default='', help='Directory path for output.')
     parser.add_argument('--nr_seq', dest='nr_seq', default=1,
-                        help='Minimum number of sequences included peptides should be a part of. Default 2.')
+                        help='Results will only include peptides present in this number of sequences or higher. Default 1.')
     parser.add_argument('--ls', dest='lower_score', default=2.,
-                        help='Results will only include peptides with a score higher than the lowest score. Default 2.')
+                        help='Results will only include peptides with a score higher than this score. Default 2.')
 
     # Define the parsed arguments
     args = parser.parse_args()
