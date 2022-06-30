@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import math
 import operator
+from glob import glob
+import os
 
 
 def hydrophobicity_scale(hydro):
@@ -81,6 +83,30 @@ def get_netsurfp_results(netsurfp_results, type):
     return(dic_of_vals)
 
 
+def get_netsurfp_csv(adir, sstype='alpha'):
+    
+    dic_of_vals = {}
+
+    for file in glob(os.path.join(adir, "*.csv")):
+        outcsv = pd.read_csv(file, index_col=0)
+        outcsv = outcsv.astype(str)
+        
+        if sstype=='alpha':
+            sstype= "q3(h)"
+        elif sstype=='beta':
+            sstype="q3(e)"
+        
+        score = '|'.join(list(outcsv[sstype].values))
+        seqs = ''.join(list(outcsv["residue"].values))
+
+        dic_of_vals[os.path.basename(file[:-4])] = seqs, score
+    
+    return dic_of_vals
+
+
+get_netsurfp_csv("nsp3-results", sstype='alpha')
+
+
 # Functions that calculate the hydrophobicity for peptides with random coil
 def gamma_emul_calc(seq, Kaa, i):
 
@@ -140,7 +166,7 @@ def g_emul(sequences, norm_df):
     # Groups repetitive sequences
     switched_gamma = switch_dictionary_gamma(g_best)
 
-    best_emul = pd.DataFrame.from_dict(switched_gamma, orient='index', columns=['score', 'names'])
+    best_emul = pd.DataFrame.from_dict(switched_gamma, orient='index', columns=['score', 'names'])     
     best_emul['sequence'] = best_emul.index
     best_emul.reset_index(inplace=True, drop=True)
     best_emul['nr_names'] = best_emul.names.apply(len)
@@ -152,6 +178,7 @@ def g_emul(sequences, norm_df):
 
 # Functions that calculate the hydrophobicity for peptides with a-helices and b-sheets
 def accum_emulsifier(emulsify_func, seq, kaa):
+    
     # Function to sum the vectors from alpha and beta
     temp_vec = ([0 ,0])
     window = [emulsify_func(seq[n], n, kaa) for n in range(0, len(seq))]
@@ -180,6 +207,40 @@ def beta_emul(amino, n, Kaa):
     return vector
 
 
+def peptide_predicter(peptides, anormdf, bnormdf, gnormdf):
+    
+    Kaa = hydrophobicity_scale(1)
+    
+    peptides['alpha'] = peptides.seq.apply(lambda x: accum_emulsifier(alpha_emul, x, Kaa))
+    peptides['alpha'] = peptides.apply(lambda x: calc_zscore(x.alpha, x.seq, anormdf), axis=1)
+    
+    peptides['beta'] = peptides.seq.apply(lambda x: accum_emulsifier(beta_emul, x, Kaa))
+    peptides['beta'] = peptides.apply(lambda x: calc_zscore(x.beta, x.seq, bnormdf), axis=1)
+
+    peptides[['gamma', 'cut']] = peptides.seq.apply(lambda x: best_g_emul(x, Kaa))
+    peptides['gamma'] = peptides.apply(lambda x: calc_zscore(x.gamma, x.seq, gnormdf, x.cut), axis=1)
+    
+    
+    return peptides
+    
+def best_g_emul(seq, Kaa):
+    
+    glist = g_emul_calcer(seq, Kaa)
+    
+    return pd.DataFrame(glist, columns=['gamma','cut']).sort_values(by='gamma', ascending=False).iloc[0]
+    
+def calc_zscore(score, seq, normdf, cut=False):
+
+    alength = len(seq)
+
+    if cut:
+        temp_df = normdf.query("Length==@alength").query("Cut==@cut")
+    else:
+        temp_df = normdf.query("Length==@alength")
+
+    return z_normalize(score, temp_df.iloc[0][1], temp_df.iloc[0][2])
+
+
 def emul(data_dic, norm_df, type):
     # Main function for calculating emul values for alpha and beta
 
@@ -189,6 +250,7 @@ def emul(data_dic, norm_df, type):
 
     for pdb_name in data_dic:
         scores, seq, proba = {}, data_dic[pdb_name][0], data_dic[pdb_name][1].split('|')
+        
         proba = [float(i) for i in proba]
 
         for i,res in enumerate(seq):
