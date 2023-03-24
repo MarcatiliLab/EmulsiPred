@@ -1,9 +1,10 @@
 import argparse
 import os
+from distutils.util import strtobool
 
 import pandas as pd
 
-from .predictors import AlphaEmulPred, BetaEmulPred, GammaEmulPred
+from EmulsiPred import AlphaEmulPred, BetaEmulPred, GammaEmulPred
 import EmulsiPred.utils as pu
 
 
@@ -18,7 +19,6 @@ def EmulsiPred(sequences, netsurfp_results=False, peptides=False, out_folder='',
     """
     os.makedirs(out_folder, exist_ok=True)
     
-    
     if not isinstance(sequences, list):
         if os.path.isfile(sequences) and (netsurfp_results==False) and (peptides==False):
             sequences = pu.read_fasta_file(sequences)
@@ -31,7 +31,7 @@ def EmulsiPred(sequences, netsurfp_results=False, peptides=False, out_folder='',
             pass
         
         else:
-            sequences = [sequences]
+            sequences = [sequences]    
     
     if peptides==True:
         sequences = pd.DataFrame(sequences, columns=['seq']).query("seq.str.len()<30", engine='python')
@@ -58,15 +58,16 @@ if __name__ == '__main__':
 
     # Parse it in
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s', dest='sequences', required=True, help='Fasta file with all the sequences.')
-    parser.add_argument('-n', dest='netsurfp_results', required=True, help='Txt file with netsurfp results.')
-    parser.add_argument('-o', dest='out_dir', default='', help='Directory path for output.')
-    parser.add_argument('--nr_seq', dest='nr_seq', default=1,
+    parser.add_argument('-s', dest='sequences',  type=str, required=True, help='Fasta file with all the sequences or txt file with netsurfp results.')
+    parser.add_argument('-n', dest='netsurfp_results',  type=strtobool, default=False, help='Whether input is netsurfp results')
+    parser.add_argument('-p', dest='peptides',  type=strtobool, default=False, help='Whether input is peptides (this will omit splitting input into smaller peptides)')
+    parser.add_argument('-o', dest='out_dir',  type=str, default='', help='Directory path for output.')
+    parser.add_argument('--nr_seq', dest='nr_seq',  type=int, default=1,
                         help='Results will only include peptides present in this number of sequences or higher. Default 1.')
-    parser.add_argument('--ls', dest='lower_score', default=2.,
+    parser.add_argument('--ls', dest='lower_score',  type=int, default=2.,
                         help='Results will only include peptides with a score higher than this score. Default 2.')
 
     # Define the parsed arguments
     args = parser.parse_args()
 
-    EmulsiPred(args.sequences, args.netsurfp_results, args.out_dir, args.nr_seq, args.lower_score)
+    EmulsiPred(args.sequences, args.netsurfp_results, args.peptides, args.out_dir, args.nr_seq, args.lower_score)

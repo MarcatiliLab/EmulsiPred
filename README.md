@@ -43,8 +43,9 @@ After installation, EmulsiPred can be run from the terminal or
 within a python script.
 
 As mentioned above, EmulsiPred requires 2 inputs.
-1) A fasta file containing the protein sequences to check for emulsifiers (termed sequence.fsa).
-2) A NetSurfP file containing secondary structure information of the sequences in sequence.fsa (termed netsurfp.txt)  
+1) A fasta file containing the protein sequences to check for emulsifiers (termed sequence.fsa) or a NetSurfP file containing secondary structure information of the sequences in sequence.fsa (termed netsurfp.txt)  
+2) Whether the input is a netsurfp file
+3) Whether the input are peptides (and therefore shouldn't be cleaved into peptides)
 
 Additionally, there are also 3 variable parameters. 
 1) o (out_dir): Output directory (default is the current directory).
@@ -54,14 +55,14 @@ Additionally, there are also 3 variable parameters.
 EmulsiPred can be run directly in the terminal with the following
 command.
 ~~~.sh
-    python -m EmulsiPred -s path/to/sequence.fsa -n path/to/netsurfp.txt -o path/to/out_dir --nr_seq 1 --ls 2
+    python -m EmulsiPred -s path/to/sequence.fsa -n False -p False -o path/to/out_dir --nr_seq 1 --ls 2
 ~~~ 
 Furthermore, it can be imported and run in a python script.
 
 ~~~~~~~~~~~~~~~~~~~~~python
 import EmulsiPred as ep
 
-ep.EmulsiPred(sequences='path/to/sequence.fsa', netsurfp_results='path/to/netsurfp.txt', out_dir='path/to/out_dir', nr_seq=1, lower_score=2)
+ep.EmulsiPred(sequences='path/to/sequence.fsa', netsurfp_results=False, peptide=False, out_dir='path/to/out_dir', nr_seq=1, lower_score=2)
 ~~~~~~~~~~~~~~~~~~~~~
 
 #### Interpretation of predictions
