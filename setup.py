@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="EmulsiPred",  # Name of package
-    version="0.0.1.1",
+    version="0.0.2",
     author="Paolo Marcatili, Tobias Olsen, Egon Hansen",
     author_email="pamar@dtu.dk",
     description="A package to predict emulsifying potential of peptides",
@@ -23,9 +23,9 @@ setuptools.setup(
     },  # Define which additional files should be included in package
     classifiers=[
         'Development Status :: 4 - Beta',
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.9',
 )

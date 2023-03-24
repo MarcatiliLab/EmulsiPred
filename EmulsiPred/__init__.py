@@ -1,1 +1,2 @@
-from .predictors import AlphaEmulPred, BetaEmulPred, GammaEmulPred, EmulsiPred
+from .predictors import AlphaEmulPred, BetaEmulPred, GammaEmulPred
+from .emulsipred import EmulsiPred
