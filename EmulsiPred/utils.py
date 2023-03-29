@@ -60,16 +60,20 @@ def get_netsurfp_results(netsurfp_results, type):
     dic_of_vals = {}
 
     for line in open(netsurfp_results, 'r'):
+        
         line = line.split(' ')
         line = list(filter(None, line))
 
-        if line[0] == 'E' or line[0] == 'B':
+        if (line[0][:1] == 'E') or (line[0][:1] == 'B'):
+            
+            if '\t' in line[0]:
+                line = line[0].split('\t')
+
             # make new list for next sequence
             if (int(line[3]) - resi_number) < 0:
                 seqs = ''
                 score = []
                 resi_number = int(line[3])
-
 
             seqs += line[1]
             # Save the score depending on which conformation you are looking at
@@ -81,26 +85,28 @@ def get_netsurfp_results(netsurfp_results, type):
             dic_of_vals[line[2]] = seqs, '|'.join(score)
             resi_number += 1
 
-    return(dic_of_vals)
+    return dic_of_vals
 
 
-def get_netsurfp_csv(adir, sstype='alpha'):
+def get_netsurfp_csv(csv_file, sstype='alpha'):
     
     dic_of_vals = {}
 
-    for file in glob(os.path.join(adir, "*.csv")):
-        outcsv = pd.read_csv(file, index_col=0)
-        outcsv = outcsv.astype(str)
+    netsurfp_df = pd.read_csv(csv_file)
+    
+    for name, sequence_df in netsurfp_df.groupby(by="id"):
+    
+        sequence_df = sequence_df.astype(str)
         
         if sstype=='alpha':
-            sstype= "q3(h)"
+            sstype= " p[q3_H]"
         elif sstype=='beta':
-            sstype="q3(e)"
+            sstype=" p[q3_E]"
         
-        score = '|'.join(list(outcsv[sstype].values))
-        seqs = ''.join(list(outcsv["residue"].values))
+        score = '|'.join(list(sequence_df[sstype].values))
+        seqs = ''.join(list(sequence_df[" seq"].values))
 
-        dic_of_vals[os.path.basename(file[:-4])] = seqs, score
+        dic_of_vals[name] = seqs, score
     
     return dic_of_vals
 

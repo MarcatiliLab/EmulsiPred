@@ -14,7 +14,7 @@ class AlphaEmulPred:
         # Change the netsurfp results into a more workable format
         
         if netsurfp_results:
-            if os.path.isdir(sequences):
+            if sequences[-3:] == 'csv':
                 self.alpha_dic = pu.get_netsurfp_csv(sequences, 'alpha')
             else:
                 self.alpha_dic = pu.get_netsurfp_results(sequences, 'alpha')
@@ -56,17 +56,17 @@ class BetaEmulPred:
             __name__, os.path.join('NormalizationValues', 'b_norm.csv')), index_col=0)
         # Change the netsurfp results into a more workable format           
         if netsurfp_results:
-            if os.path.isdir(sequences):
-                self.alpha_dic = pu.get_netsurfp_csv(sequences, 'beta')
+            if sequences[-3:] == 'csv':
+                self.beta_dic = pu.get_netsurfp_csv(sequences, 'beta')
             else:
-                self.alpha_dic = pu.get_netsurfp_results(sequences, 'beta')
+                self.beta_dic = pu.get_netsurfp_results(sequences, 'beta')
         else:
-            self.alpha_dic = sequences.copy()
-            for key, value in self.alpha_dic.items():
-                self.alpha_dic[key] = value, '|'.join(['1.000' for _ in value])
+            self.beta_dic = sequences.copy()
+            for key, value in self.beta_dic.items():
+                self.beta_dic[key] = value, '|'.join(['1.000' for _ in value])
             
         # Calculation of the hydrophobicity + normalization
-        self._predictions = pu.many_calculate_emul(self.alpha_dic, self.norm_df, pu.beta_emul)
+        self._predictions = pu.many_calculate_emul(self.beta_dic, self.norm_df, pu.beta_emul)
         self._adjusted_predictions = self._predictions
 
     @property
@@ -97,7 +97,7 @@ class GammaEmulPred:
             __name__, os.path.join('NormalizationValues', 'g_norm.csv')), index_col=0)
         # Change the netsurfp results into a more workable format
         if netsurfp_results:
-            if os.path.isdir(sequences):
+            if sequences[-3:] == 'csv':
                 self.gamma_dic = pu.get_netsurfp_csv(sequences, 'beta')
                 
             else:

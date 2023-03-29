@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="EmulsiPred",  # Name of package
-    version="0.0.2",
+    version="0.0.3",
     author="Paolo Marcatili, Tobias Olsen, Egon Hansen",
     author_email="pamar@dtu.dk",
     description="A package to predict emulsifying potential of peptides",
