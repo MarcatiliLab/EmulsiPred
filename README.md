@@ -60,7 +60,7 @@ Furthermore, it can be imported and run in a python script.
 ~~~~~~~~~~~~~~~~~~~~~python
 import EmulsiPred as ep
 
-ep.EmulsiPred(sequences='path/to/sequence.fsa', netsurfp_results=False, peptides=False, out_dir='path/to/out_dir', nr_seq=1, lower_score=2)
+ep.EmulsiPred(sequences='path/to/sequence.fsa', netsurfp_results=False, peptides=False, out_folder='path/to/out_dir', nr_seq=1, lower_score=2)
 ~~~~~~~~~~~~~~~~~~~~~
 
 #### Interpretation of predictions
